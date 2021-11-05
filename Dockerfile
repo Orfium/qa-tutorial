@@ -17,6 +17,7 @@ WORKDIR /qa-project
 COPY requirements.txt requirements.txt
 
 COPY wait_for_local_server.sh /wait_for_local_server.sh
+
 RUN chmod +x /wait_for_local_server.sh
 
 RUN pip install --no-cache-dir -r requirements_dev.txt

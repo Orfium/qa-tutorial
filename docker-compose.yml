@@ -1,7 +1,6 @@
 # docker-compose.yml file example
 version: "3.9"
 services:
-
   api-tests-container:
     container_name: api-tests
     build:
