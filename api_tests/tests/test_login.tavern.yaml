@@ -1,0 +1,26 @@
+test_name: Login returns a successful response
+
+includes:
+  - !include ../config/routes.yaml
+
+marks:
+  - regression
+  - login
+
+stages:
+  - name: User is able to login with the correct credentials
+    request:
+      url: "{app_env_settings.api_url}{login_route}"
+      json:
+        $ext:
+          function: login_verifications:get_user_credentials
+          extra_kwargs:
+            user_description: "verified_writer"
+            app_env_settings: !force_format_include "{app_env_settings}"
+      method: POST
+      headers:
+        accept: application/json
+        content-type: application/json
+    response:
+      status_code: 201
+      verify_response_with:
