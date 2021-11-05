@@ -1,17 +1,19 @@
-attrs==19.3.0
-chardet==3.0.4
-importlib-metadata==0.17
-more-itertools==8.3.0
-packaging==20.4
-pluggy==0.13.1
-py==1.8.1
-pyparsing==2.4.7
-pytest==5.4.3
-python-dotenv==0.13.0
-selenium==3.141.0
-selenium-wire==1.0.11
-six==1.12.0
-urllib3==1.25.9
-wcwidth==0.1.7
-zipp==0.5.1
-requests
+# suggested packages
+python-dotenv==0.14.0 # https://github.com/theskumar/python-dotenv
+tavern==1.14.0 # https://github.com/taverntesting/tavern
+requests==2.23.0 # https://github.com/psf/requests
+colorlog==4.2.1 # https://github.com/borntyping/python-colorlog
+polling==0.3.1 # https://github.com/justiniso/polling
+boto3==1.17.48 # https://github.com/boto/boto3
+sure==1.4.11 # https://github.com/gabrielfalcao/sure
+Faker==8.1.1 # https://github.com/joke2k/faker
+pytest-xdist==2.2.1 # https://github.com/pytest-dev/pytest-xdist
+wait-for-it==2.2.1 # https://github.com/clarketm/wait-for-it
+schema==0.7.4 # https://github.com/keleshev/schema
+
+# Pytest
+# ------------------------------------------------------------------------------
+allure-pytest==2.8.40 # https://github.com/allure-framework/allure-python
+pytest==6.2.2 # https://github.com/pytest-dev/pytest
+pytest-html==3.1.1 # https://github.com/pytest-dev/pytest-html
+pytest-xdist==2.2.1 # https://github.com/pytest-dev/pytest-xdist

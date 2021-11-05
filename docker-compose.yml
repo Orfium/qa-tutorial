@@ -1,0 +1,15 @@
+# docker-compose.yml file example
+version: "3.9"
+services:
+
+  allocation-api-tests:
+    container_name: allocation-api-tests
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    image: qa-cmo-allocation
+    networks:
+      - default
+      - api-network
+    entrypoint: [ "/wait_for_local_server.sh" ]
+    command: pytest -n 8 --env ${APP_ENV_NAME} -m ${TAG}
