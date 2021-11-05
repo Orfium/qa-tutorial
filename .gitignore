@@ -1,0 +1,8 @@
+*.pyc
+.idea/*
+__pycache__/
+.pytest_cache/*
+/tests/.pytest_cache/*
+/tests/pytest_report.log
+!/browser_download_folder/.gitkeep
+.env
