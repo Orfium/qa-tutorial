@@ -5,11 +5,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 ENVIRONMENTS = {
-    "local": {"api_url": "http://localhost:8000/api"}
-    "staging": {
-        "api_url": "https://application-staging/api"
-    },
-    "live": {"api_url": "https://application-live/api"},
+    "local": {"api_url": "http://localhost:8000/api"},
+    "staging": {"api_url": "https://application-staging/api"},
+    "live": {"api_url": "https://application-live/api"}
 }
 
 

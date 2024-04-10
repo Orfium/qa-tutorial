@@ -1,0 +1,44 @@
+test_name: This is a simple test
+
+# Explain the use of markers
+marks:
+  - regression
+  - tavern_workshop
+
+# Explain the syntax of stages
+stages:
+    - name: Get authorization token
+      request:
+        url: "https://restful-booker.herokuapp.com/auth"
+        method: POST
+        json:
+          username: "admin"
+          password: "password123"
+      response:
+        status_code: 200
+        save:
+          json:
+           auth_token: token
+
+---
+test_name: This is a test with a declaration of a reusable stage
+
+marks:
+  - regression
+  - tavern_workshop
+
+stages:
+  # Define a reusable stage through: - &name_of_reusable_stage
+  - &get_auth_token
+    name: Get authorization token
+    request:
+      url: "https://restful-booker.herokuapp.com/auth"
+      method: POST
+      json:
+        username: "admin"
+        password: "password123"
+    response:
+      status_code: 200
+      save:
+        json:
+          auth_token: token
