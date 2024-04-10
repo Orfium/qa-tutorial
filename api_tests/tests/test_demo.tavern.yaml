@@ -26,6 +26,7 @@ marks:
   - tavern_workshop
 
 stages:
+  # Define a reusable stage through: - &name_of_reusable_stage
   - &create_booking
 
     name: Create a booking
@@ -56,18 +57,26 @@ marks:
   - tavern_workshop
 
 stages:
+  # This is how you call a reusable stage
   - *create_booking
 
   - name: Search for a booking
     request:
-      url: "https://restful-booker.herokuapp.com/booking/"
+      url: "https://restful-booker.herokuapp.com/booking/{bookingid}"
       method: GET
       headers:
         Content-Type: application/json
-      params:
-        bookingid: "{bookingid}"
     response:
       status_code: 200
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
 
 ---
 test_name: This test validates only one pair of key values, even if the response has more.
@@ -136,3 +145,77 @@ stages:
           totalprice: 111
           depositpaid: true
         bookingid: !anyint
+
+---
+test_name: This test validates the specific keys from the response using an external function
+
+marks:
+  - tavern_workshop
+
+stages:
+
+  - name: Validate the keys from the response using an external function
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      headers:
+        Content-Type: application/json
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+    response:
+      status_code: 200
+      verify_response_with:
+        - function: booking_responses_verifications:validate_firstname_lastname_of_booking_response
+          extra_kwargs:
+            firstname: "Jim"
+            lastname: "Brown"
+
+---
+test_name: This test adds the max_retries and delay_after parameters
+
+marks:
+  - tavern_workshop
+
+stages:
+
+    - name: Create a booking
+      # max_retries: The number of times the test runner should retry the request in case of a failure before marking the test as failed.
+      max_retries: 2
+      request:
+        url: "https://restful-booker.herokuapp.com/booking"
+        method: POST
+        headers:
+          Content-Type: application/json
+        json:
+          firstname: "Jim"
+          lastname: "Brown"
+          totalprice: 111
+          depositpaid: true
+          bookingdates:
+            checkin: "2018-01-01"
+            checkout: "2019-01-01"
+          additionalneeds: "Breakfast"
+      response:
+        status_code: 200
+        save:
+          json:
+            bookingid: bookingid
+        # delay_after: The amount of time (in seconds) the test runner should wait after the request is made before proceeding to the next stage.
+      delay_after: 2
+
+
+    - name: Search for a booking
+      request:
+        url: "https://restful-booker.herokuapp.com/booking/{bookingid}"
+        method: GET
+        headers:
+          Content-Type: application/json
+      response:
+        status_code: 200
