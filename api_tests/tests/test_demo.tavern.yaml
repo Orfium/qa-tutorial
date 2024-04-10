@@ -2,7 +2,6 @@ test_name: This is a simple test for getting the authorization token
 
 # Explain the use of markers
 marks:
-  - regression
   - tavern_workshop
 
 # Explain the syntax of stages
@@ -21,40 +20,20 @@ stages:
            auth_token: token
 
 ---
-test_name: This is a test for using the authorization request in another test
+test_name: This is a test with a declaration of a reusable stage
 
 marks:
-  - regression
   - tavern_workshop
 
 stages:
-  # Define a reusable stage through: - &name_of_reusable_stage
-  - &get_auth_token
-    name: Get authorization token
-    request:
-      url: "https://restful-booker.herokuapp.com/auth"
-      method: POST
-      json:
-        username: "admin"
-        password: "password123"
-    response:
-      status_code: 200
-      save:
-        json:
-          auth_token: token
+  - &create_booking
 
----
-test_name: This is a test which creates a new booking
-
-marks:
-  - regression
-  - tavern_workshop
-
-stages:
-  - name: Create a booking
+    name: Create a booking
     request:
       url: "https://restful-booker.herokuapp.com/booking"
       method: POST
+      headers:
+        Content-Type: application/json
       json:
         firstname: "Jim"
         lastname: "Brown"
@@ -66,3 +45,94 @@ stages:
         additionalneeds: "Breakfast"
     response:
       status_code: 200
+      save:
+        json:
+          bookingid: bookingid
+
+---
+test_name: This is a test which calls a reusable stage
+
+marks:
+  - tavern_workshop
+
+stages:
+  - *create_booking
+
+  - name: Search for a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/"
+      method: GET
+      headers:
+        Content-Type: application/json
+      params:
+        bookingid: "{bookingid}"
+    response:
+      status_code: 200
+
+---
+test_name: This test validates only one pair of key values, even if the response has more.
+# With the use of strict: - json:off, we can ignore the part of the response not mentioned in the test
+strict:
+  - json:off
+
+marks:
+  - tavern_workshop
+
+stages:
+
+  - name: Validate specific keys from the response
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      headers:
+        Content-Type: application/json
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+    response:
+      status_code: 200
+      json:
+        booking:
+          firstname: "Jim"
+          lastname: "Brown"
+---
+test_name: This test validates the keys from the response ignoring the order
+# With the use of strict: - json:list_any_order, we can ignore the order of the response json objects
+strict:
+  - json:list_any_order
+
+marks:
+  - tavern_workshop
+
+stages:
+
+  - name: Validate the keys from the response ignoring the order
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      headers:
+        Content-Type: application/json
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+    response:
+      status_code: 200
+      json:
+        booking:
+          firstname: "Jim"
+          lastname: "Brown"
+          totalprice: 111
+          depositpaid: true
+        bookingid: !anyint
