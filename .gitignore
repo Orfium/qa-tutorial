@@ -6,3 +6,4 @@ __pycache__/
 /tests/pytest_report.log
 !/browser_download_folder/.gitkeep
 .env
+reports/*

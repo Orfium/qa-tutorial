@@ -58,11 +58,11 @@ stages:
       json:
         firstname: "Jim"
         lastname: "Brown"
-        totalprice: 90
+        totalprice: 111
         depositpaid: true
-        bookingdates.checkin: "2018-01-01"
-        bookingdates.checkout: "2019-01-01"
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
         additionalneeds: "Breakfast"
     response:
       status_code: 200
-
