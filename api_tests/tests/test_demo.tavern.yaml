@@ -1,4 +1,4 @@
-test_name: This is a simple test
+test_name: This is a simple test for getting the authorization token
 
 # Explain the use of markers
 marks:
@@ -21,7 +21,7 @@ stages:
            auth_token: token
 
 ---
-test_name: This is a test with a declaration of a reusable stage
+test_name: This is a test for using the authorization request in another test
 
 marks:
   - regression
@@ -42,3 +42,27 @@ stages:
       save:
         json:
           auth_token: token
+
+---
+test_name: This is a test which creates a new booking
+
+marks:
+  - regression
+  - tavern_workshop
+
+stages:
+  - name: Create a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 90
+        depositpaid: true
+        bookingdates.checkin: "2018-01-01"
+        bookingdates.checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+    response:
+      status_code: 200
+
