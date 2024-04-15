@@ -150,6 +150,7 @@ strict:
 
 marks:
   - tavern_workshop
+  - validate_specific_keys
 
 stages:
 
@@ -209,6 +210,7 @@ test_name: This test validates the specific keys from the response using an exte
 
 marks:
   - tavern_workshop
+  - external_function
 
 stages:
 
