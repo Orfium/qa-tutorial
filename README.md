@@ -1,10 +1,26 @@
 # QA Tutorial
-
-
 A test project created to include useful files for API test automation projects using Tavern API testing framework.
 
-# Tips & Hints
 
+# Installation Guidelines
+1. Clone the repository
+2. Create a virtual environment (on project's root folder: `cd qa-tutorial`)
+   1. Through venv: 
+      - `python3.9 -m venv qa-tutorial-venv`
+      - Activate the virtual environment
+        - On Windows: `qa-tutorial-venv\Scripts\activate` (?)
+        - On Linux/Mac: `source qa-tutorial-venv/bin/activate`
+   2. Or through pycharm:
+      - Open the project in PyCharm
+      - Go to File -> Settings -> Project: qa-tutorial -> Python Interpreter
+      - Click on the gear icon and select Add
+      - Select Virtualenv Environment -> New Environment -> OK
+      - Select the base interpreter and click OK
+3. Install the required packages: `pip install -r requirements.txt`
+4. Verify the installation by running the tests: `pytest -m validation_test`
+
+
+# Tips & Hints
 If you want to run something once in your tests, you can utilize the pytest hooks named pytest_sessionstart & pytest_sessionfinish . The first one runs once before the pytest session starts to collect the available tests. The latter runs once when every test session is finished.
 
 Keep in mind that if you use pytest-xdist plugin, the tests run in parallel sessions, hence the hooks mentioned above run every time one of these sessions is finished meaning that anything inside pytest_sessionstart / pytest_sessionfinish will be executed more than one times. To avoid that case, you can add the following condition:

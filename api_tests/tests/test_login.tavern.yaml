@@ -1,7 +1,8 @@
 test_name: Login returns a successful response
 
-includes:
-  - !include ../config/routes.yaml
+# File routes.yaml doesn't exist in the project
+#includes:
+#  - !include ../config/routes.yaml
 
 marks:
   - regression
@@ -23,4 +24,19 @@ stages:
         content-type: application/json
     response:
       status_code: 201
-      verify_response_with:
+---
+test_name: This is a test for validation purpose
+
+marks:
+  - validation_test
+
+stages:
+    - name: Get authorization token
+      request:
+        url: "https://restful-booker.herokuapp.com/auth"
+        method: POST
+        json:
+          username: "admin"
+          password: "password123"
+      response:
+        status_code: 200

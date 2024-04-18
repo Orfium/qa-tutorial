@@ -1,8 +1,10 @@
 import sys
 import pytest
-from settings.config import AppEnvSettings
+
 
 from pathlib import Path, WindowsPath
+
+from api_tests.settings.config import AppEnvSettings
 
 path = Path(__file__)
 if sys.platform == "win32":

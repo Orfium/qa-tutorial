@@ -1,10 +1,10 @@
 # suggested packages
 python-dotenv==0.14.0 # https://github.com/theskumar/python-dotenv
-tavern==1.14.0 # https://github.com/taverntesting/tavern
+tavern==2.9.3 # https://github.com/taverntesting/tavern
 requests==2.23.0 # https://github.com/psf/requests
 colorlog==4.2.1 # https://github.com/borntyping/python-colorlog
 polling==0.3.1 # https://github.com/justiniso/polling
-boto3==1.17.48 # https://github.com/boto/boto3
+#boto3==1.17.48 # https://github.com/boto/boto3
 sure==1.4.11 # https://github.com/gabrielfalcao/sure
 Faker==8.1.1 # https://github.com/joke2k/faker
 pytest-xdist==2.2.1 # https://github.com/pytest-dev/pytest-xdist
@@ -13,7 +13,7 @@ schema==0.7.4 # https://github.com/keleshev/schema
 
 # Pytest
 # ------------------------------------------------------------------------------
-allure-pytest==2.8.40 # https://github.com/allure-framework/allure-python
-pytest==6.2.2 # https://github.com/pytest-dev/pytest
+allure-pytest == 2.13.3 # https://github.com/allure-framework/allure-python
+pytest==7.2.2 # https://github.com/pytest-dev/pytest
 pytest-html==3.1.1 # https://github.com/pytest-dev/pytest-html
 pytest-xdist==2.2.1 # https://github.com/pytest-dev/pytest-xdist
