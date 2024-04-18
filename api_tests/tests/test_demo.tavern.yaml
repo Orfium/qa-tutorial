@@ -109,7 +109,7 @@ stages:
   # This is how you call a reusable stage
   - *create_booking_jim
 
-  - &search_for_booking
+  - &search_for_booking_jim
     name: Search for a booking
     request:
       # {booking_id} is known from reusable function create_booking (it was saved before)
@@ -291,11 +291,11 @@ marks:
   - update_booking
 
 stages:
-  - *create_booking_lila
+  - *create_booking_jim
 
   - name: Update a booking
     request:
-      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_jim}"
       method: PATCH
       headers:
         Content-Type: application/json
@@ -305,15 +305,28 @@ stages:
     response:
       status_code: 200
       json:
-        firstname: Lila
-        lastname: Sugar
+        firstname: Jim
+        lastname: Brown
+        # changed totalprice from 111 to 9876
         totalprice: 9876
         depositpaid: true
         bookingdates:
           checkin: "2018-01-01"
           checkout: "2019-01-01"
-        additionalneeds: Dinner
+        additionalneeds: Breakfast
 
+  - <<: *search_for_booking_jim
+    response:
+      status_code: 200
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 9876
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
 ---
 test_name: This test deletes a booking
 
