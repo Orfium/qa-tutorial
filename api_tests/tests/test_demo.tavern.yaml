@@ -244,10 +244,9 @@ stages:
           firstname: "Jim"
           lastname: "Brown"
 ---
-test_name: This test validates the some of the json objects from the response ignoring the order
-# With the use of strict: - json:list_any_order, we can ignore the order of the response json objects
+test_name: This test validates some of the json objects from the response (ignoring their order)
+# As explained earlier with this we will not validate the whole response.
 strict:
-  # As explained earlier with this we will not validate the whole response.
   - json:off
 
 marks:
@@ -266,6 +265,7 @@ stages:
       headers:
         Content-Type: application/json
     response:
+      # With the use of strict: - json:list_any_order, we can ignore the order of the response json objects
       strict:
         - json:list_any_order
       status_code: 200
