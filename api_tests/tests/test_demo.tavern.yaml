@@ -20,8 +20,8 @@ stages:
           json:
             # auth_token is our variable and token is the response's key
             auth_token: token
-
 ---
+# ----------------- Reusable stage Tests -----------------
 test_name: This is a test with a declaration of a reusable stage
 
 marks:
@@ -107,7 +107,6 @@ marks:
 stages:
   # This is how you call a reusable stage
   - *create_booking_jim
-
   - &search_for_booking_jim
     name: Search for a booking
     request:
@@ -127,7 +126,6 @@ stages:
           checkin: "2018-01-01"
           checkout: "2019-01-01"
         additionalneeds: "Breakfast"
-
 ---
 test_name: EXPECTED TO FAIL - This test alters a reusable stage's response
 
@@ -142,6 +140,78 @@ stages:
       # This test fails as it expects status_code: 202 but the actual response is 200
       status_code: 202
 ---
+# ----------------- Update and Delete Methods -----------------
+test_name: This test partially updates a value of a booking
+
+marks:
+  - tavern_workshop
+  - update_booking
+
+stages:
+  - *create_booking_jim
+  - name: Update a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_jim}"
+      method: PATCH
+      headers:
+        Content-Type: application/json
+        Authorization: "Basic YWRtaW46cGFzc3dvcmQxMjM="
+      json:
+        totalprice: 9876
+    response:
+      status_code: 200
+      json:
+        firstname: Jim
+        lastname: Brown
+        # changed totalprice from 111 to 9876
+        totalprice: 9876
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: Breakfast
+
+  - <<: *search_for_booking_jim
+    response:
+      status_code: 200
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 9876
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+---
+test_name: This test deletes a booking
+
+marks:
+  - tavern_workshop
+  - delete_booking
+
+stages:
+  - *create_booking_lila
+  - name: Delete a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
+      method: DELETE
+      headers:
+        Content-Type: application/json
+        Authorization: "Basic YWRtaW46cGFzc3dvcmQxMjM="
+    response:
+      status_code: 201
+
+  - name: Validate the booking has been deleted
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      status_code: 404
+---
+# ----------------- Tavern Tricks Tests -----------------
 test_name: This test validates only one pair of key values, even if the response has more.
 # With the use of strict: - json:off, we can ignore the part of the response not mentioned in the test
 strict:
@@ -152,7 +222,6 @@ marks:
   - validate_specific_keys
 
 stages:
-
   - name: Validate specific keys from the response
     request:
       url: "https://restful-booker.herokuapp.com/booking"
@@ -203,39 +272,6 @@ stages:
       json:
         - bookingid: !int "{booking_id_jim}"
         - bookingid: !int "{booking_id_lila}"
-
----
-test_name: This test validates the specific keys from the response using an external function
-
-marks:
-  - tavern_workshop
-  - external_function
-
-stages:
-
-  - name: Validate the keys from the response using an external function
-    request:
-      url: "https://restful-booker.herokuapp.com/booking"
-      method: POST
-      headers:
-        Content-Type: application/json
-      json:
-        firstname: "Jim"
-        lastname: "Brown"
-        totalprice: 111
-        depositpaid: true
-        bookingdates:
-          checkin: "2018-01-01"
-          checkout: "2019-01-01"
-        additionalneeds: "Breakfast"
-    response:
-      status_code: 200
-      verify_response_with:
-        - function: booking_responses_verifications:validate_firstname_lastname_of_booking_response
-          extra_kwargs:
-            firstname: "Jim"
-            lastname: "Brown"
-
 ---
 test_name: This test adds the max_retries and delay_after parameters
 
@@ -244,7 +280,6 @@ marks:
   - retries
 
 stages:
-
     - name: Create a booking
       # max_retries: The number of times the test runner should retry the request in case of a failure before marking the test as failed.
       max_retries: 2
@@ -272,7 +307,6 @@ stages:
       # delay_after: The amount of time (in seconds) the test runner should wait after the request is made before proceeding to the next stage.
       delay_after: 2
 
-
     - name: Search for a booking
       request:
         url: "https://restful-booker.herokuapp.com/booking/{booking_id}"
@@ -281,81 +315,39 @@ stages:
           Content-Type: application/json
       response:
         status_code: 200
-
 ---
-test_name: This test partially updates a value of a booking
+# ----------------- External Functions Test -----------------
+test_name: This test validates the specific keys from the response using an external function
 
 marks:
   - tavern_workshop
-  - update_booking
+  - external_function
 
 stages:
-  - *create_booking_jim
-
-  - name: Update a booking
+  - name: Validate the keys from the response using an external function
     request:
-      url: "https://restful-booker.herokuapp.com/booking/{booking_id_jim}"
-      method: PATCH
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
       headers:
         Content-Type: application/json
-        Authorization: "Basic YWRtaW46cGFzc3dvcmQxMjM="
-      json:
-        totalprice: 9876
-    response:
-      status_code: 200
-      json:
-        firstname: Jim
-        lastname: Brown
-        # changed totalprice from 111 to 9876
-        totalprice: 9876
-        depositpaid: true
-        bookingdates:
-          checkin: "2018-01-01"
-          checkout: "2019-01-01"
-        additionalneeds: Breakfast
-
-  - <<: *search_for_booking_jim
-    response:
-      status_code: 200
       json:
         firstname: "Jim"
         lastname: "Brown"
-        totalprice: 9876
+        totalprice: 111
         depositpaid: true
         bookingdates:
           checkin: "2018-01-01"
           checkout: "2019-01-01"
         additionalneeds: "Breakfast"
----
-test_name: This test deletes a booking
-
-marks:
-  - tavern_workshop
-  - delete_booking
-
-stages:
-  - *create_booking_lila
-
-  - name: Delete a booking
-    request:
-      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
-      method: DELETE
-      headers:
-        Content-Type: application/json
-        Authorization: "Basic YWRtaW46cGFzc3dvcmQxMjM="
     response:
-      status_code: 201
-
-  - name: Validate the booking has been deleted
-    request:
-      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
-      method: GET
-      headers:
-        Content-Type: application/json
-    response:
-      status_code: 404
+      status_code: 200
+      verify_response_with:
+        - function: booking_responses_verifications:validate_firstname_lastname_of_booking_response
+          extra_kwargs:
+            firstname: "Jim"
+            lastname: "Brown"
 ---
-# ----------------- Debugger -----------------
+# ----------------- Debugger Tests -----------------
 test_name: EXPECTED TO FAIL - This test uses a debugger from external function
 
 marks:
@@ -363,7 +355,6 @@ marks:
   - debugger
 
 stages:
-
   - name: Debug the response
     request:
       url: "https://restful-booker.herokuapp.com/booking/test"
@@ -374,7 +365,6 @@ stages:
       status_code: 200 # wrong status_code so we can see the debugger's logs
       verify_response_with:
         - function: booking_responses_verifications:debug_response
-
 ---
 test_name: EXPECTED TO FAIL - This test uses a debugger from external function passing also a variable
 marks:
@@ -382,7 +372,6 @@ marks:
   - debugger_with_variable
 
 stages:
-
   - *create_booking_lila
   - name: Debug the response
     request:
