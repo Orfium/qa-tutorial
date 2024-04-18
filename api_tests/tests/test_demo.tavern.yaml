@@ -97,7 +97,6 @@ stages:
       save:
         json:
           booking_id_lila: bookingid
-
 ---
 test_name: This is a test which calls a reusable stage
 
@@ -355,3 +354,48 @@ stages:
         Content-Type: application/json
     response:
       status_code: 404
+---
+# ----------------- Debugger -----------------
+test_name: EXPECTED TO FAIL - This test uses a debugger from external function
+
+marks:
+  - tavern_workshop
+  - debugger
+
+stages:
+
+  - name: Debug the response
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/test"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      status_code: 200 # wrong status_code so we can see the debugger's logs
+      verify_response_with:
+        - function: booking_responses_verifications:debug_response
+
+---
+test_name: EXPECTED TO FAIL - This test uses a debugger from external function passing also a variable
+marks:
+  - tavern_workshop
+  - debugger_with_variable
+
+stages:
+
+  - *create_booking_lila
+  - name: Debug the response
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      # if test fails received response status & body won't be shown
+      # this is where a debugger function can be useful
+      status_code: 404 # wrong status_code so we can see the debugger's logs
+      # status_code: 200
+      verify_response_with:
+        - function: booking_responses_verifications:debug_response
+          extra_kwargs:
+            variable: "{booking_id_lila}"
