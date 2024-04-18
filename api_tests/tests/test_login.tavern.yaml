@@ -24,3 +24,19 @@ stages:
         content-type: application/json
     response:
       status_code: 201
+---
+test_name: This is a test for validation purpose
+
+marks:
+  - validation_test
+
+stages:
+    - name: Get authorization token
+      request:
+        url: "https://restful-booker.herokuapp.com/auth"
+        method: POST
+        json:
+          username: "admin"
+          password: "password123"
+      response:
+        status_code: 200

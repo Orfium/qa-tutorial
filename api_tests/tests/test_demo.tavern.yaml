@@ -2,6 +2,7 @@ test_name: This is a simple test for getting the authorization token
 
 # Explain the use of markers
 marks:
+  - auth_token_test
   - tavern_workshop
 
 # Explain the syntax of stages
