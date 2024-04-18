@@ -1,3 +1,4 @@
+#### PANOS -> INTRO & THIS TEST
 test_name: This is a simple test for getting the authorization token
 
 # Explain the use of markers
@@ -22,6 +23,7 @@ stages:
             # auth_token is our variable and token is the response's key
             auth_token: token
 ---
+#### GINA -> REUSABLE TESTS
 # ----------------- Reusable stage Tests -----------------
 test_name: This is a test with a declaration of a reusable stage
 
@@ -141,6 +143,7 @@ stages:
       # This test fails as it expects status_code: 202 but the actual response is 200
       status_code: 202
 ---
+#### PANOS
 # ----------------- Update and Delete Methods -----------------
 test_name: This test partially updates a value of a booking
 
@@ -212,6 +215,7 @@ stages:
     response:
       status_code: 404
 ---
+#### BOTH
 # ----------------- Tavern Tricks Tests -----------------
 test_name: This test validates only one pair of key values, even if the response has more.
 # With the use of strict: - json:off, we can ignore the part of the response not mentioned in the test
@@ -348,6 +352,7 @@ stages:
             firstname: "Jim"
             lastname: "Brown"
 ---
+#### GINA
 # ----------------- Debugger Tests -----------------
 test_name: EXPECTED TO FAIL - This test uses a debugger from external function
 

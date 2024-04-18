@@ -16,7 +16,7 @@ def debug_response(response, variable=None):
     print(f"Status code: {response.status_code}")
     print(f"Reason: {response.reason}")
     if variable:
-        print(f"Booking ID: {variable}")
+        print(f"Variable: {variable}")
     try:
         response_json = response.json()
         print(f"Response body: {json.dumps(response_json, indent=4)}")
