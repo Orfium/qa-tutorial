@@ -1,0 +1,295 @@
+test_name: This is a simple test for getting the authorization token
+
+marks:
+  - auth_token_test
+  - tavern_workshop
+
+stages:
+    - name: Get authorization token
+      request:
+        url: "https://restful-booker.herokuapp.com/auth"
+        method: POST
+        json:
+          username: "admin"
+          password: "password123"
+      response:
+        status_code: 200
+        # Explain save functionality
+        save:
+          json:
+            # auth_token is our variable and token is the response's key
+            auth_token: token
+---
+# ----------------- Reusable stage Tests -----------------
+test_name: This is a test with a declaration of a reusable stage
+
+marks:
+  - tavern_workshop
+  - define_reusable_stage
+
+stages:
+  # Define a reusable stage through: - &name_of_reusable_stage
+  - &create_booking_jim
+    name: Create a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      headers:
+        Content-Type: application/json
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+    response:
+      status_code: 200
+      json:
+        # !anyint is a placeholder for unknown integer values
+        bookingid: !anyint
+        booking:
+          firstname: Jim
+          lastname: Brown
+          totalprice: 111
+          depositpaid: true
+          bookingdates:
+            checkin: "2018-01-01"
+            checkout: "2019-01-01"
+          additionalneeds: Breakfast
+      save:
+        json:
+          booking_id_jim: bookingid
+
+  - &create_booking_lila
+    name: Create a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      headers:
+        Content-Type: application/json
+      json:
+        firstname: "Lila"
+        lastname: "Sugar"
+        totalprice: 139
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Dinner"
+    response:
+      status_code: 200
+      json:
+        # !anyint is a placeholder for unknown integer values
+        bookingid: !anyint
+        booking:
+          firstname: Lila
+          lastname: Sugar
+          totalprice: 139
+          depositpaid: true
+          bookingdates:
+            checkin: "2018-01-01"
+            checkout: "2019-01-01"
+          additionalneeds: Dinner
+      save:
+        json:
+          booking_id_lila: bookingid
+---
+test_name: This is a test which calls a reusable stage
+
+marks:
+  - tavern_workshop
+  - call_reusable_stage
+
+stages:
+  # This is how you call a reusable stage
+  - *create_booking_jim
+  # This is how you define a reusable stage
+  - &search_for_booking_jim
+    name: Search for a booking
+    request:
+      # {booking_id} is known from reusable function create_booking (it was saved before)
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_jim}"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      status_code: 200
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+---
+# ----------------- Update, Patch and Delete Methods -----------------
+test_name: This test partially updates a value of a booking and alters a reusable stage's response
+
+marks:
+  - tavern_workshop
+  - alter_reusable_stage
+  - update_booking
+
+stages:
+  - *create_booking_jim
+  - name: Update a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_jim}"
+      method: PATCH
+      headers:
+        Content-Type: application/json
+        Authorization: "Basic YWRtaW46cGFzc3dvcmQxMjM="
+      json:
+        totalprice: 9876
+    response:
+      status_code: 200
+
+  # With - <<: *name_of_reusable_stage, you can override the response of a reusable stage
+  - <<: *search_for_booking_jim
+    response:
+      status_code: 200
+      # Here we validate the responses expected after the patch instead of the original response of reusable stage search_for_booking_jim
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 9876
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+---
+test_name: This test updates a booking
+
+marks:
+  - tavern_workshop
+  - update_booking
+
+stages:
+  - *create_booking_jim
+  - name: Update a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_jim}"
+      method: PUT
+      headers:
+        Content-Type: application/json
+        Authorization: "Basic YWRtaW46cGFzc3dvcmQxMjM="
+      json:
+        firstname: "Tim"
+        lastname: "Blue"
+        totalprice: 222
+        depositpaid: false
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Brunch"
+    response:
+      status_code: 200
+
+  - <<: *search_for_booking_jim
+    response:
+      status_code: 200
+      json:
+        firstname: "Tim"
+        lastname: "Blue"
+        totalprice: 222
+        depositpaid: false
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Brunch"
+---
+test_name: This test deletes a booking
+
+marks:
+  - tavern_workshop
+  - delete_booking
+
+stages:
+  - *create_booking_lila
+  - name: Delete a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
+      method: DELETE
+      headers:
+        Content-Type: application/json
+        Authorization: "Basic YWRtaW46cGFzc3dvcmQxMjM="
+    response:
+      status_code: 201
+
+  - name: Validate the booking has been deleted
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      status_code: 404
+---
+# ----------------- Tavern Tricks Tests -----------------
+test_name: This test validates only one pair of key values, even if the response has more.
+# With the use of strict: - json:off, we can ignore the part of the response not mentioned in the test
+strict:
+  - json:off
+
+marks:
+  - tavern_workshop
+  - validate_specific_keys
+
+stages:
+  - name: Validate specific keys from the response
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      headers:
+        Content-Type: application/json
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+    response:
+      status_code: 200
+      # Here we validate only the first and last name from the json body of the response
+      json:
+        booking:
+          firstname: "Jim"
+          lastname: "Brown"
+---
+test_name: This test validates part of the json body of the response (ignoring their order)
+# As explained earlier with json:off we will not validate the whole response.
+strict:
+  - json:off
+
+marks:
+  - tavern_workshop
+  - list_any_order
+
+stages:
+  # This is how you call a reusable stage
+  - *create_booking_jim
+  - *create_booking_lila
+
+  - name: Validate the keys from the response ignoring the order
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      # With the use of strict: - json:list_any_order, we can ignore the order of the response json objects
+      strict:
+        - json:list_any_order
+      status_code: 200
+      json:
+        - bookingid: !int "{booking_id_jim}"
+        - bookingid: !int "{booking_id_lila}"
