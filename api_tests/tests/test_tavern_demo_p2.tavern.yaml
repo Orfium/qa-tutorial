@@ -1,0 +1,120 @@
+test_name: This test adds the max_retries and delay_after parameters
+
+marks:
+  - demo_p2
+  - tavern_workshop
+  - retries
+
+stages:
+  &create_booking_lila
+  - name: Create a booking
+    # max_retries: The number of times the test runner should retry the request in case of a failure before marking the test as failed.
+    max_retries: 2
+    # delay_before: The amount of time (in seconds) the test runner should wait before the request is made
+    delay_before: 2
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      headers:
+        Content-Type: application/json
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+    response:
+      status_code: 200
+      save:
+        json:
+          booking_id: bookingid
+    # delay_after: The amount of time (in seconds) the test runner should wait after the request is made before proceeding to the next stage.
+    delay_after: 2
+
+  - name: Search for a booking
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id}"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      status_code: 200
+---
+# ----------------- External Functions Test -----------------
+test_name: This test validates the specific keys from the response using an external function
+
+marks:
+  - demo_p2
+  - tavern_workshop
+  - external_function
+
+stages:
+  - name: Validate the keys from the response using an external function
+    request:
+      url: "https://restful-booker.herokuapp.com/booking"
+      method: POST
+      headers:
+        Content-Type: application/json
+      json:
+        firstname: "Jim"
+        lastname: "Brown"
+        totalprice: 111
+        depositpaid: true
+        bookingdates:
+          checkin: "2018-01-01"
+          checkout: "2019-01-01"
+        additionalneeds: "Breakfast"
+    response:
+      status_code: 200
+      verify_response_with:
+        - function: booking_responses_verifications:validate_firstname_lastname_of_booking_response
+          extra_kwargs:
+            firstname: "Jim"
+            lastname: "Brown"
+---
+# ----------------- Debugger Tests -----------------
+test_name: EXPECTED TO FAIL - This test uses a debugger from external function
+
+marks:
+  - demo_p2
+  - tavern_workshop
+  - debugger
+
+stages:
+  - name: Debug the response
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/test"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      status_code: 200 # wrong status_code so we can see the debugger's logs
+      verify_response_with:
+        - function: booking_responses_verifications:debug_response
+---
+test_name: EXPECTED TO FAIL - This test uses a debugger from external function passing also a variable
+marks:
+  - demo_p2
+  - tavern_workshop
+  - debugger_with_variable
+
+stages:
+  - *create_booking_lila
+  - name: Debug the response
+    request:
+      url: "https://restful-booker.herokuapp.com/booking/{booking_id_lila}"
+      method: GET
+      headers:
+        Content-Type: application/json
+    response:
+      # if test fails received response status & body won't be shown
+      # this is where a debugger function can be useful
+      status_code: 404 # wrong status_code so we can see the debugger's logs
+      # status_code: 200
+      verify_response_with:
+        - function: booking_responses_verifications:debug_response
+          extra_kwargs:
+            variable: "{booking_id_lila}"
